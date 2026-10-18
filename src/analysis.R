@@ -58,7 +58,24 @@ clean_scores_vector <- function(scores) {
 # names attached. Accumulating into a fresh vector with out <- c(out, value)
 # drops them, and the check compares with identical(), which notices.
 clean_scores_scalar <- function(scores) {
-    stop("TODO: implement clean_scores_scalar()")
+
+    out <- setNames(as.double(scores), names(scores)) 
+
+    for (i in seq_along(scores)){                     # visit each score by position
+        score <- scores[[i]]                          # get the current score
+        if (is.na(score)){
+            out[[i]] <- 0                             # replace a missing score with 0
+        }else {
+            out[[i]] <- score * 2                     # double a nonmissing score
+
+            if (out[[i]] > 20){
+                out[[i]] <- 20                        # cap the adjusted score at 20
+            }
+        }
+    }
+
+    out                                              
+
 }
 
 # build_roster(student_names, groups, scores)
@@ -90,7 +107,29 @@ clean_scores_scalar <- function(scores) {
 # order. factor(groups, levels = unique(groups)) keeps first-appearance order.
 # unname() is what strips the names off the two score columns.
 build_roster <- function(student_names, groups, scores) {
-    stop("TODO: implement build_roster()")
+
+    names <- as.character(student_names)                # convert names to character values
+
+    group <- factor(groups, levels = unique(groups))    # preserve first-appearance group order
+
+    raw_score <- unname(scores)                         # remove names from the raw scores
+
+    adjusted_score <- clean_scores_vector(raw_score)    # clean and adjust the raw scores
+
+    passed = adjusted_score >= 12                       # mark scores of at least 12 as passed
+
+    result <- data.frame(                               # combine the columns into a roster
+        name = names,
+        group = group,
+        raw_score = raw_score,
+        adjusted_score = adjusted_score,
+        passed = passed,
+        stringsAsFactors = FALSE                        # keep names as character values
+
+    )
+
+    result
+
 }
 
 # summarize_roster(roster)
@@ -123,5 +162,26 @@ build_roster <- function(student_names, groups, scores) {
 # split() can divide adjusted_score by every factor level. vapply() can then
 # compute one mean for each part and return a named vector with no dimensions.
 summarize_roster <- function(roster) {
-    stop("TODO: implement summarize_roster()")
+
+    rows <- nrow(roster)                                       # count the students
+
+    missing_raw <- sum(is.na(roster$raw_score))                # count missing raw scores
+    
+    mean_adjusted <- mean(roster$adjusted_score)               # average the adjusted scores
+    
+    passed <- roster$name[roster$passed]                       # select the passing students
+   
+    score_groups <- split(roster$adjusted_score, roster$group) # separate scores by group
+   
+    mean_by_group <- vapply(score_groups, mean, numeric(1))    # average each group's scores
+
+    result <- list(
+        rows = rows,
+        missing_raw = missing_raw,
+        mean_adjusted = mean_adjusted,
+        passed = passed,
+        mean_by_group = mean_by_group
+    )
+
+    result
 }
