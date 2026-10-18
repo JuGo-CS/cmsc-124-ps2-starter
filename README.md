@@ -6,7 +6,7 @@ Problem Set 2. The assignment manual defines the work and the submission rules.
 
 ## Pair
 
-- Full Name (`@github-username`)
+- John Matthew Fallarme (`@Matty-05`)
 - Kenneth Garcia Mondejar (`@JuGo-CS`)
 
 ## Layout
