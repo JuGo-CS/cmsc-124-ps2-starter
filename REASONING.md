@@ -7,57 +7,57 @@ After you run and find a miss, add a short correction entry under that case in a
 later commit.
 
 ## P01
-There is a double among the given values which results in an implicit coercion where all elements in the created vector were upgraded to double. This rule produces a flat vector of length 3 with no dimension containing the upgraded values [1,2,3.5].
+A double among the given values causes implicit coercion, so every element in the created vector is upgraded to double. This produces a flat vector of length 3 with no dimension and the value [1,2,3.5].
 
 ## P02
-There is a character string among the given values which results in an implicit coercion where all elements in the created vector were upgraded to character. This produces a flat character vector of length 3 with no dimension containing the string values ["1","2","TRUE"].
+A character string among the given values causes implicit coercion, so every element in the created vector is upgraded to character. This produces a flat character vector of length 3 with no dimension and the values ["1","2","TRUE"].
 
 ## P03
-The shorter vector, which in this example is c(1L, 2L), was recycled to match the length of the longer vector before the element-wise addition happens. This integer addition results in an integer vector value of [11,22,31,42], a length of 4, and no dimension.
+The shorter vector, c(1L, 2L), is recycled to match the length of the longer vector before the element-wise addition happens. This integer addition results in an integer vector with the value [11,22,31,42], a length of 4, and no dimension.
 
 ## P04
-In R, since it uses 1-based indexing, the given expression extracts elements by their positional index (3rd and 1st index) in order. This positional subsetting produces a flat integer vector value of [third=9,first=8] with a length of 2 and no dimension.
+R uses 1-based indexing, so the given expression extracts elements at the 3rd and 1st positions, in that order. This positional subsetting produces a flat integer vector with the value [third=9,first=8], a length of 2, and no dimension.
 
 ## P05
-With the given negative index, means that returning all values in the vector except the value at the given index position. Since the index -2L means return all values in the vector except the second element, it produces an integer vector value of [4,9] with a length of 2 and no dimension.
+A negative index excludes the specified position from the vector. Since -2L excludes only the second element, the result keeps every other element. It is an integer vector with the value [4,9], a length of 2, and no dimension.
 
-Correction: Based on my reasoning, the result has a length of 2, but I put length=1 in predictions.tsv. This was just a typo, sir.:>
+Correction: I predicted length 1 in predictions.tsv, but R returned length 2. The negative index -2L excludes only the second element, which leaves two elements. My reasoning already said length 2, so I mistyped the table entry.
 
 ## P06
-Logical indexing filters the input vector by returning only values where the condition is passed (either TRUE or NA), which means that it returns the values that are NA or greater than 10. This results into an integer vector value of [NA_integer_,12] with a length of 2 and no dimension.
+Logical indexing filters the input vector by returning only the values where the condition passes (either TRUE or NA), so it returns the values that are NA or greater than 10. This results in an integer vector with the value [NA_integer_,12], a length of 2, and no dimension.
 
-Correction: My predicted value is [NA_integer_,12] which is wrong because the missing values uses the general NA shorthand.
+Correction: I predicted the value [NA_integer_,12], but R printed [NA,12]. The grader writes typed missing constants such as NA_integer_ as plain NA inside vector brackets. I also misread the selector rule: at the missing position, is.na(x) is TRUE, and TRUE | NA evaluates to TRUE. The missing element is selected because the condition is TRUE, not because the condition is NA.
 
 ## P07
-The factors conver the input text data into a categorical integer codes mapped to a unique levels attribute. This given conversion produces an underlying integer type value of factor[low,high,low];levels=[low,high] with a total length of 3 and no dimension.
+A factor converts the input text data into categorical integer codes mapped to a unique levels attribute. This produces an underlying integer type with the value factor[low,high,low];levels=[low,high], a length of 3, and no dimension.
 
 ## P08
-Creates a list that is a generic vector that holds elements of different types and lengths. The total length of the ouput list is 2 which is based on the number of top-level components it contains, returning a list type, with a value of list{scores=[3,5],label=["A"]} with no dimension.
+list() creates a generic vector that holds elements of different types and lengths. The output list has a length of 2, based on the number of top-level components it contains. It has a list type, the value list{scores=[3,5],label=["A"]}, and no dimension.
 
 ## P09
-A data frame is like a list with vectors that have an equal length of a representing columns. This tabular structure produces a list type value of data.frame[2x2]{id=[1,2],passed=[TRUE,FALSE]} with a length of 2 columns and an explicit 2D dimension of 2x2.
+A data frame is a list of equal-length columns. This tabular structure has the type list, the value of data.frame[2x2]{id=[1,2],passed=[TRUE,FALSE]}, a length of 2 columns, and a 2D dimension of 2x2.
 
 ## P10
-The recycling of a vector to match the length of the longer matrix allows to proceed with the element-wise addition operation column by column. This results in an integer type matrix value of matrix[2x3](11,22,13,24,15,26) with a length of 6 and a dimension of 2x3.
+The recycling of the vector to match the length of the matrix allows the element-wise addition to proceed. Matrix values are stored column by column, so the addition runs down the columns. This results in an integer matrix with the value matrix[2x3](11,22,13,24,15,26), a length of 6, and a dimension of 2x3.
 
 ## P11
-The mean() function calculates the average of the given values, but since there is a missing value (NA_real_), it automatically returns NA_real_ as the resulting value. This summary output has a data type of double, a length of 1, and no dimension.
+The mean() function calculates the average of the given values, but since one of the values is missing (NA_real_), the result is also missing. This summary output has the type double, a length of 1, and no dimension, with the value NA_real_.
 
-Correction: My predicted value is NA_real_ which is wrong because the missing values uses the general NA shorthand.
+Correction: I predicted the value NA_real_, but R's canonical description was [NA]. The grader represents missing values as NA inside vector brackets, so the length-one result is written [NA].
 
 ## P12
-Using na.rm = TRUE will remove all missing values before calculating the average value of the remaining elements. This mathematical operation outputs a single double value of [9] with a length of 1 and no dimension.
+Using na.rm = TRUE removes all missing values before calculating the average value of the remaining elements. This operation outputs a single double value of [9], a length of 1, and no dimension.
 
 ## P13
-The vector x first holds integer values but then the operation x[2] <- 2.5 results in implicitly converting the entire vector storage type to double. This in-place modification outputs a double vector value of [1,2.5,3] with a length of 3 and no dimension.
+The vector x first holds integer values, but the subassignment x[2] <- 2.5 widens the entire vector from integer to double so the new value fits. The result is a double vector with the value of [1,2.5,3], a length of 3, and no dimension.
 
 ## P14
-The ifelse operation maps over all values in scores where elements are changed to 0 if they are missing (NA_real_), and otherwise are doubled. This operation forces a double type vector value of [14,0,24,8], which is then capped down to [14,0,15,8] with a length of 4 and no dimension.
+The ifelse operation maps over all values in scores where elements become 0 if they are missing (NA_real_), and are doubled otherwise. This produces a double type vector with the value [14,0,24,8], which is then capped down to [14,0,15,8], with a length of 4, and no dimension.
 
-Correction: My predicted type for this given is integer, which was incorrect because of the `NA_real_` on the initial scores vector value which automatically upgrades the entire calculation to double precision.
+Correction: I predicted the type as integer, but R returned double. The literals 7, 12, and 4 are already doubles in R, not only the NA_real_ value, and scores * 2 is also a double. So the input vector and the ifelse() result are double, and the final vector is double.
 
 ## P15
-The array function reshapes a flat vector sequence into multi-dimensional boundaries using the attribute dim while keeping its data type. This structural mapping produces an integer type value of array[2x2x2](1,2,3,4,5,6,7,8) with a length of 8 and a 3D dimension of 2x2x2.
+array() attaches a dim attribute to the integer vector, which arranges its values in three dimensions while keeping the integer type. This produces the value array[2x2x2](1,2,3,4,5,6,7,8), a length of 8, and a dimension of 2x2x2.
 
 ## P16
-Indexing a vector with a 0 index will return an empty vector with a length of zero while completely retaining the original data type. This specific subsetting produces an empty integer value of [] with a length of 0 and no dimension.
+Indexing a vector with 0 returns an empty vector and retains the original data type. This subsetting produces an empty integer vector with the value [], a length of 0, and no dimension.
