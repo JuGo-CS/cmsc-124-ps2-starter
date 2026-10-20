@@ -1,12 +1,9 @@
 # Vector and Scalar Evaluation
 
-<!-- Replace this paragraph after your checks pass. Trace one input, including the
-missing value, through `clean_scores_vector()` and `clean_scores_scalar()`.
-Compare the two evaluation models, identify where recycling would change the
-answer, and explain which implementation you would keep in an R program. -->
+In `clean_scores_vector()`, operations apply to the entire vector without explicit iteration. The sample input is `c(Ada = 8, Grace = NA, Linus = 12, Barbara = 4)`. First, `is.na(scores)` checks every element and creates a logical mask. Grace's position is `TRUE`, so subassignment changes her missing score from `NA` to `0`. Next, `scores * 2.0` doubles the entire vector, producing `c(16, 0, 24, 8)`. Finally, `scores > 20` checks every adjusted score. Linus's value is the only one above 20, so the final subassignment caps it at 20. The returned values are `c(16, 0, 20, 8)`, with the original names preserved.
 
-In the `clean_scores_vector()` function, operations apply to the entire vector without explicit iteration. For the input, Grace's missing score  `NA`, the evaluation transforms her element through these 3 distinct steps:
+In `clean_scores_scalar()`, `seq_along(scores)` visits Ada, Grace, Linus, and Barbara in that order. Each iteration extracts one value with `scores[[i]]` and completes its transformation before moving to the next student. Ada's 8 doubles to 16. During Grace's iteration, `is.na(score)` is true, so the function stores 0 and skips the `else` block. Linus's 12 doubles to 24 and is capped at 20. Barbara's 4 doubles to 8. This loop makes evaluation order visible because each missing-value, doubling, and capping decision occurs during a specific iteration.
 
-First is that on `is.na(scores)`, it evaluates each value on the vector where, on Grace's position, it will hold `TRUE` resulting in reassigning her value from `NA` to `0`. Next, the `scores * 2` will double each value, thus converting Grace's `0` into `0 * 2 = 0`, still 0. Lastly, the `scores > 20` evaluates Grace's position results to `FALSE` (`0 > 20`), leaving her score to remain 0.
+A careless recycling example would replace `scores * 2.0` with `scores * c(2, 3, 4)`. For the input `c(2, 4, 6, 8)`, R recycles the shorter multiplier as `c(2, 3, 4, 2)`. Multiplication produces `c(4, 12, 24, 16)`, and the cap changes 24 to 20, giving `c(4, 12, 20, 16)`. Ordinary doubling would produce `c(4, 8, 12, 16)`. R warns because the vector lengths are four and three, and four is not a multiple of three, but it still returns the recycled calculation.
 
-In contrast, `clean_scores_scalar()` ...
+I would keep the vector implementation because its three expressions directly match the required transformation: replace missing values, double the scores, and apply the cap. It is shorter and easier to scan than the scalar loop. The scalar implementation is useful for tracing and debugging because it shows exactly when each student is processed. Choosing the vector version gives concise, idiomatic R code, while the tradeoff is less step-by-step visibility.
